@@ -128,9 +128,17 @@ export function MatchPopup({ match, preds, currentUserId, onClose }: Props) {
                         )}
                       </p>
                       <p className="text-xs text-pb-muted">
-                        {p.goals_a} – {p.goals_b}
-                        {match.stage > 1 && p.went_to_penalties && ' · penales'}
-                        {match.stage > 1 && p.winner_team && ` · pasa ${p.winner_team}`}
+                        {match.stage === 1
+                          ? `Predijo: ${
+                              p.winner_team === match.team_a
+                                ? `gana ${match.team_a}`
+                                : p.winner_team === match.team_b
+                                  ? `gana ${match.team_b}`
+                                  : 'empate'
+                            }`
+                          : `${p.goals_a} – ${p.goals_b}${
+                              p.went_to_penalties ? ' · penales' : ''
+                            }${p.winner_team ? ` · pasa ${p.winner_team}` : ''}`}
                       </p>
                     </div>
                     {pts !== null && (

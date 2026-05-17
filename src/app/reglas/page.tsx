@@ -113,9 +113,7 @@ function PointsTable() {
       stage: 'Etapa 1 — Grupos',
       multiplier: 'x1',
       rows: [
-        ['Resultado (gana A / B / empate)', '+1'],
-        ['Goles exactos equipo A', '+1'],
-        ['Goles exactos equipo B', '+1'],
+        ['Resultado (gana A / empate / gana B)', '+1'],
       ],
     },
     {

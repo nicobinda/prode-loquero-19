@@ -55,19 +55,30 @@ export async function savePrediction(input: PredictionInput): Promise<SaveResult
     return { ok: false, error: 'Goles inválidos (0–20)' };
   }
 
-  // En knockout: winner_team obligatorio si los goles son iguales (porque
-  // necesitamos saber quién pasa). Si no son iguales, lo derivamos del marcador.
   let winner_team: string | null = null;
   let went_to_penalties = false;
+  let goals_a = input.goalsA;
+  let goals_b = input.goalsB;
+
   if (match.stage === 1) {
-    // Resultado se deriva — no se carga winner explícito.
-    winner_team = null;
+    // Loquero stage 1: pronóstico por resultado (gana A / empate / gana B).
+    // Goles no son relevantes — se persisten como 0/0 (sentinel).
+    if (
+      input.winnerTeam !== null &&
+      input.winnerTeam !== match.team_a &&
+      input.winnerTeam !== match.team_b
+    ) {
+      return { ok: false, error: 'Equipo ganador inválido' };
+    }
+    winner_team = input.winnerTeam;
+    goals_a = 0;
+    goals_b = 0;
   } else {
+    // Knockout: winner se deriva del marcador, salvo empate (penales)
     went_to_penalties = !!input.wentToPenalties;
     if (input.goalsA > input.goalsB) winner_team = match.team_a;
     else if (input.goalsA < input.goalsB) winner_team = match.team_b;
     else {
-      // empate en knockout → necesita winner explícito (penales)
       if (!input.winnerTeam) {
         return {
           ok: false,
@@ -78,15 +89,15 @@ export async function savePrediction(input: PredictionInput): Promise<SaveResult
         return { ok: false, error: 'Equipo ganador inválido' };
       }
       winner_team = input.winnerTeam;
-      went_to_penalties = true; // si empató en knockout, fue a penales
+      went_to_penalties = true;
     }
   }
 
   const row = {
     user_id: user.id,
     match_id: match.id,
-    goals_a: input.goalsA,
-    goals_b: input.goalsB,
+    goals_a,
+    goals_b,
     went_to_penalties,
     winner_team,
   };
