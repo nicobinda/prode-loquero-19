@@ -12,7 +12,7 @@ export function AppHeader({ nickname, current }: Props) {
       <Link href="/" className="flex items-center gap-2 min-w-0">
         <Image
           src="/logo-prode-binda.png"
-          alt="Prode Binda 2026"
+          alt="Prode Loquero 19"
           width={32}
           height={32}
           priority

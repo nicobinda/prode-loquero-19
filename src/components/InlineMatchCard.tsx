@@ -132,13 +132,13 @@ function Stage1Card({
       {!isTbd && (
         <div className="grid grid-cols-3 gap-2">
           <PickBtn
-            label={isTbdCode(match.team_a) ? 'A' : match.team_a}
+            label={`Gana ${isTbdCode(match.team_a) ? 'A' : match.team_a}`}
             selected={pick === 'A'}
             onClick={() => choose('A')}
           />
           <PickBtn label="Empate" selected={pick === 'D'} onClick={() => choose('D')} />
           <PickBtn
-            label={isTbdCode(match.team_b) ? 'B' : match.team_b}
+            label={`Gana ${isTbdCode(match.team_b) ? 'B' : match.team_b}`}
             selected={pick === 'B'}
             onClick={() => choose('B')}
           />

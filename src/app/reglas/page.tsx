@@ -63,7 +63,7 @@ export default async function RulesPage() {
         />
         <p className="text-sm text-pb-muted">
           Ante empate entre campeones de una etapa, el premio se reparte
-          equitativamente. La participación cuesta <strong>USD 70</strong>.
+          equitativamente.
         </p>
       </Section>
 

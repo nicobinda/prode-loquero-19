@@ -85,7 +85,7 @@ export function LoginForm() {
       <header>
         <p className="font-display text-sm font-bold uppercase tracking-[0.10em] text-pb-ceruleo">
           {step === 'dni'
-            ? '¡Hola, familia!'
+            ? '¡Hola, loquero!'
             : step === 'pin'
               ? 'Te conocemos…'
               : step === 'set-pin'
