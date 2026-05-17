@@ -1,0 +1,52 @@
+﻿1. El Prode tiene un campeón general, que corresponde al jugador que haya obtenido más puntos totales.
+
+2. Además el Prode se divide en 3 etapas, cada una con su ganador. Los puntajes se reinician entre cada etapa, pero se suman para calcular el campeón general. Las etapas son:
+   * Etapa 1: Fase de grupos (72 partidos)
+   * Etapa 2: 16vos y 8vos (24 partidos)
+   * Etapa 3: 4tos, Semis y Final (8 partidos)
+
+
+   3. El resultado de cada partido se puede completar y corregir en cualquier momento hasta el inicio del partido. Una vez iniciado ya no permite modificaciones.
+
+   4. Los jugadores no podrán ver los resultados cargados por otros jugadores antes de que inicie un partido. Una vez iniciado ya se publican todas las respuestas de ese partido.
+
+   5. Los puntajes obtenidos en un partido entre equipo A y equipo B se calculan de la siguiente manera:
+
+Etapa 1
+
+      * +1 punto por adivinar si gana Equipo A, Equipo B o es empate
+      * +1 punto por adivinar cantidad exacta de goles de equipo A
+      * +1 punto por adivinar cantidad exacta de goles del equipo B
+
+
+Etapa 2
+
+
+      * +3 puntos por adivinar si pasa Equipo A o Equipo B
+      * +3 puntos por adivinar cantidad exacta de goles de equipo A
+      * +3 puntos por adivinar cantidad exacta de goles del equipo B
+      * +1 puntos por adivinar si fueron a penales
+
+        Etapa 3
+
+
+         * +9 puntos por adivinar si pasa Equipo A o Equipo B
+         * +9 puntos por adivinar cantidad exacta de goles de equipo A
+         * +9 puntos por adivinar cantidad exacta de goles del equipo B
+         * +3 puntos por adivinar si fueron a penales
+
+
+
+            6. Ante un empate entre ganadores de una etapa, se reparte el premio equitativamente entre todos los ganadores
+
+            7. Si un jugador no completa un resultado. Obtiene 0 puntos por ese partido.
+
+            8. Las etapas 2 y 3 solo se habilitan al finalizar las etapas anteriores.
+
+            9. La participación en el Prode cuesta $100 USD.
+
+            10. Los premios se dividen de la siguiente manera:
+- Campeón general: 40% del pozo
+- Campeón Etapa 1: 20% del pozo
+- Campeón Etapa 2: 20% del pozo
+- Campeón Etapa 3: 20% del pozo
