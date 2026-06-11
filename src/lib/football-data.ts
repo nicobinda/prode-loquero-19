@@ -54,7 +54,7 @@ async function call<T>(path: string): Promise<T> {
   }
   const res = await fetch(`${BASE}${path}`, {
     headers: { 'X-Auth-Token': env.footballData.token },
-    next: { revalidate: 60 },
+    cache: 'no-store',
   });
   if (!res.ok) {
     throw new Error(`football-data ${res.status}: ${await res.text()}`);

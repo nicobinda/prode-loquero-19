@@ -103,7 +103,9 @@ export async function syncMatches(): Promise<SyncResult> {
   }
 
   // Protección: si en DB el partido está finished pero la API dice scheduled,
-  // no lo pisamos (puede ser override manual o simulación de admin).
+  // no lo pisamos (preserva simulación o override manual previo).
+  // Pero si la API dice 'live' o 'finished', siempre actualizamos:
+  // el partido real arrancó y debe sobrescribir la simulación.
   const externalIds = rows.map((r) => r.external_id);
   const { data: existing } = await supabaseAdmin()
     .from('matches')
@@ -117,7 +119,7 @@ export async function syncMatches(): Promise<SyncResult> {
   );
 
   const filteredRows = rows.filter(
-    (r) => !finishedInDb.has(r.external_id) || r.status === 'finished',
+    (r) => !finishedInDb.has(r.external_id) || r.status !== 'scheduled',
   );
 
   if (filteredRows.length === 0) {
