@@ -75,6 +75,11 @@ export async function fetchCompetitionInfo(): Promise<unknown> {
   return call(`/competitions/${env.footballData.competition}`);
 }
 
+// Fetch del match completo (endpoint individual)
+export async function fetchMatchById(id: number): Promise<unknown> {
+  return call(`/matches/${id}`);
+}
+
 // Mapeo: stage de football-data → nuestro 1/2/3
 export function stageOf(s: FdMatch['stage']): 1 | 2 | 3 {
   if (s === 'GROUP_STAGE') return 1;
