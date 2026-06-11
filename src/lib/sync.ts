@@ -102,25 +102,45 @@ export async function syncMatches(): Promise<SyncResult> {
     };
   }
 
-  // Protección: si en DB el partido está finished pero la API dice scheduled,
-  // no lo pisamos (preserva simulación o override manual previo).
-  // Pero si la API dice 'live' o 'finished', siempre actualizamos:
-  // el partido real arrancó y debe sobrescribir la simulación.
+  // Protección: traemos el estado actual de los matches para tomar decisiones.
   const externalIds = rows.map((r) => r.external_id);
   const { data: existing } = await supabaseAdmin()
     .from('matches')
-    .select('external_id, status')
+    .select('external_id, status, goals_a, goals_b, winner_team, went_to_penalties')
     .in('external_id', externalIds);
 
-  const finishedInDb = new Set(
-    (existing ?? [])
-      .filter((e) => e.status === 'finished')
-      .map((e) => e.external_id as number),
+  const existingByExt = new Map(
+    (existing ?? []).map((e) => [e.external_id as number, e]),
   );
 
-  const filteredRows = rows.filter(
-    (r) => !finishedInDb.has(r.external_id) || r.status !== 'scheduled',
-  );
+  // Lógica:
+  // 1) Si DB.status === 'finished' y API.status === 'scheduled': SKIP
+  //    (preserva simulación o override manual previo)
+  // 2) Si API trae goles null pero la DB tenía valores reales: preservar los
+  //    de DB (evita perder un resultado por lag de football-data)
+  const filteredRows = rows
+    .filter((r) => {
+      const ex = existingByExt.get(r.external_id);
+      if (ex?.status === 'finished' && r.status === 'scheduled') return false;
+      return true;
+    })
+    .map((r) => {
+      const ex = existingByExt.get(r.external_id);
+      if (!ex) return r;
+      const apiNulls = r.goals_a === null && r.goals_b === null;
+      const dbHasGoals = ex.goals_a !== null || ex.goals_b !== null;
+      if (apiNulls && dbHasGoals) {
+        return {
+          ...r,
+          goals_a: ex.goals_a,
+          goals_b: ex.goals_b,
+          // si la DB tenía un winner, también lo preservamos
+          winner_team: r.winner_team ?? ex.winner_team,
+          went_to_penalties: r.went_to_penalties || ex.went_to_penalties,
+        };
+      }
+      return r;
+    });
 
   if (filteredRows.length === 0) {
     return {
