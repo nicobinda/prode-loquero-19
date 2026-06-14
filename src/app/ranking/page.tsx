@@ -14,15 +14,29 @@ export default async function RankingPage() {
   if (!user.nickname) redirect('/onboarding');
 
   const sb = supabaseAdmin();
-  const [{ data: users }, { data: matches }, { data: predictions }] =
-    await Promise.all([
-      sb
-        .from('users')
-        .select('id, nickname, avatar_url')
-        .not('nickname', 'is', null),
-      sb.from('matches').select('*'),
-      sb.from('predictions').select('*'),
-    ]);
+  const [{ data: users }, { data: matches }] = await Promise.all([
+    sb
+      .from('users')
+      .select('id, nickname, avatar_url')
+      .not('nickname', 'is', null),
+    sb.from('matches').select('*'),
+  ]);
+
+  // Solo predicciones de partidos finalizados (subset chico).
+  // Crítico: el default de Supabase es 1000 rows — si la tabla predictions
+  // supera eso (jugadores × partidos), el ranking pierde data silenciosamente.
+  const finishedMatchIds = ((matches ?? []) as Match[])
+    .filter((m) => m.status === 'finished')
+    .map((m) => m.id);
+
+  const { data: predictions } =
+    finishedMatchIds.length > 0
+      ? await sb
+          .from('predictions')
+          .select('*')
+          .in('match_id', finishedMatchIds)
+          .limit(50000)
+      : { data: [] as Prediction[] };
 
   type RankUser = Pick<User, 'id' | 'nickname' | 'avatar_url'>;
   const ranking = computeRanking({

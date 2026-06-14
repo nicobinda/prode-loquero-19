@@ -29,12 +29,13 @@ export default async function Home() {
     .map((m) => m.id);
 
   const [{ data: myPredsData }, { data: lockedPredsData }] = await Promise.all([
-    sb.from('predictions').select('*').eq('user_id', user.id),
+    sb.from('predictions').select('*').eq('user_id', user.id).limit(50000),
     lockedMatchIds.length > 0
       ? sb
           .from('predictions')
           .select('*, user:users(id, nickname, avatar_url)')
           .in('match_id', lockedMatchIds)
+          .limit(50000)
       : Promise.resolve({ data: [] as PredWithUser[] }),
   ]);
 
