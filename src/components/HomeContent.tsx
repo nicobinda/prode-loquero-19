@@ -174,6 +174,33 @@ export function HomeContent({
   const activePhaseHasOpen = activePhaseMatches.some(isPredictable);
   const activeMeta = PHASE_META[defaultPhase];
 
+  // "Partido actual": el live más reciente; si no hay live, el último finished
+  const currentMatch = useMemo(() => {
+    const live = matches
+      .filter((m) => m.status === 'live')
+      .sort((a, b) => b.kickoff_at.localeCompare(a.kickoff_at))[0];
+    if (live) return live;
+    const finished = matches
+      .filter((m) => m.status === 'finished')
+      .sort((a, b) => b.kickoff_at.localeCompare(a.kickoff_at))[0];
+    return finished ?? null;
+  }, [matches]);
+
+  function goToCurrentMatch() {
+    if (!currentMatch) return;
+    const scroll = () => {
+      const el = document.getElementById(`match-${currentMatch.id}`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    if (currentMatch.stage !== phase) {
+      changePhase(currentMatch.stage);
+      // Esperar al re-render con la fase nueva
+      setTimeout(scroll, 80);
+    } else {
+      scroll();
+    }
+  }
+
   return (
     <>
       {activePhaseHasOpen && (
@@ -202,6 +229,16 @@ export function HomeContent({
               Ver →
             </span>
           )}
+        </button>
+      )}
+
+      {currentMatch && (
+        <button
+          type="button"
+          onClick={goToCurrentMatch}
+          className="self-end rounded-full bg-white px-3.5 py-1.5 font-display text-[11px] font-bold uppercase tracking-wider text-pb-navy shadow-[0_2px_8px_rgba(11,29,94,0.08)] hover:bg-pb-very-light-blue active:translate-y-px"
+        >
+          Partido actual ↓
         </button>
       )}
 

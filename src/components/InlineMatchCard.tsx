@@ -114,7 +114,7 @@ function Stage1Card({
   }
 
   return (
-    <article className="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-[0_4px_12px_rgba(11,29,94,0.06)]">
+    <article id={`match-${match.id}`} className="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-[0_4px_12px_rgba(11,29,94,0.06)] scroll-mt-24">
       <header className="flex items-center justify-between gap-2">
         <span className="font-display text-[11px] font-bold uppercase tracking-wider text-pb-muted truncate">
           {match.round}
@@ -238,7 +238,7 @@ function KnockoutCard({
   }
 
   return (
-    <article className="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-[0_4px_12px_rgba(11,29,94,0.06)]">
+    <article id={`match-${match.id}`} className="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-[0_4px_12px_rgba(11,29,94,0.06)] scroll-mt-24">
       <header className="flex items-center justify-between gap-2">
         <span className="font-display text-[11px] font-bold uppercase tracking-wider text-pb-muted truncate">
           {match.round}

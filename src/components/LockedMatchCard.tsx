@@ -23,8 +23,9 @@ export function LockedMatchCard({ match, myPrediction, onOpen, showDay }: Props)
   return (
     <button
       type="button"
+      id={`match-${match.id}`}
       onClick={onOpen}
-      className="flex w-full flex-col gap-3 rounded-2xl bg-white p-4 text-left shadow-[0_4px_12px_rgba(11,29,94,0.06)] transition hover:shadow-[0_6px_16px_rgba(11,29,94,0.10)] active:translate-y-px"
+      className="flex w-full flex-col gap-3 rounded-2xl bg-white p-4 text-left shadow-[0_4px_12px_rgba(11,29,94,0.06)] transition hover:shadow-[0_6px_16px_rgba(11,29,94,0.10)] active:translate-y-px scroll-mt-24"
     >
       <header className="flex items-center justify-between gap-2">
         <span className="font-display text-[11px] font-bold uppercase tracking-wider text-pb-muted truncate">
