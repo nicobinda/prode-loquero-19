@@ -106,7 +106,7 @@ export async function syncMatches(): Promise<SyncResult> {
   const externalIds = rows.map((r) => r.external_id);
   const { data: existing } = await supabaseAdmin()
     .from('matches')
-    .select('external_id, status, goals_a, goals_b, winner_team, went_to_penalties')
+    .select('external_id, status, goals_a, goals_b, winner_team, went_to_penalties, team_a, team_b')
     .in('external_id', externalIds);
 
   const existingByExt = new Map(
@@ -129,17 +129,32 @@ export async function syncMatches(): Promise<SyncResult> {
       if (!ex) return r;
       const apiNulls = r.goals_a === null && r.goals_b === null;
       const dbHasGoals = ex.goals_a !== null || ex.goals_b !== null;
+      // Preservar team codes una vez que son reales (no placeholder).
+      // Si la API cambia el código (ej. URU → URY), las predicciones rompen.
+      const apiTeamA = r.team_a;
+      const apiTeamB = r.team_b;
+      const isPlaceholderA = (ex.team_a as string)?.startsWith('_');
+      const isPlaceholderB = (ex.team_b as string)?.startsWith('_');
+      const team_a = !isPlaceholderA ? (ex.team_a as string) : apiTeamA;
+      const team_b = !isPlaceholderB ? (ex.team_b as string) : apiTeamB;
+      // Si reemplazamos team_a/team_b por el código preservado, hay que
+      // remapear winner_team también para mantener consistencia.
+      let winner_team = r.winner_team;
+      if (winner_team === apiTeamA && team_a !== apiTeamA) winner_team = team_a;
+      else if (winner_team === apiTeamB && team_b !== apiTeamB)
+        winner_team = team_b;
       if (apiNulls && dbHasGoals) {
         return {
           ...r,
+          team_a,
+          team_b,
+          winner_team: winner_team ?? ex.winner_team,
           goals_a: ex.goals_a,
           goals_b: ex.goals_b,
-          // si la DB tenía un winner, también lo preservamos
-          winner_team: r.winner_team ?? ex.winner_team,
           went_to_penalties: r.went_to_penalties || ex.went_to_penalties,
         };
       }
-      return r;
+      return { ...r, team_a, team_b, winner_team };
     });
 
   if (filteredRows.length === 0) {
