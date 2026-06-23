@@ -23,26 +23,35 @@ export default async function RankingPage() {
   ]);
 
   // Solo predicciones de partidos finalizados (subset chico).
-  // Crítico: el default de Supabase es 1000 rows — si la tabla predictions
-  // supera eso (jugadores × partidos), el ranking pierde data silenciosamente.
+  // Supabase tiene hard-cap de 1000 rows por respuesta (config PostgREST),
+  // .limit() no lo levanta. Paginamos con .range() para no perder data.
   const finishedMatchIds = ((matches ?? []) as Match[])
     .filter((m) => m.status === 'finished')
     .map((m) => m.id);
 
-  const { data: predictions } =
-    finishedMatchIds.length > 0
-      ? await sb
-          .from('predictions')
-          .select('*')
-          .in('match_id', finishedMatchIds)
-          .limit(50000)
-      : { data: [] as Prediction[] };
+  const predictions: Prediction[] = [];
+  if (finishedMatchIds.length > 0) {
+    const PAGE = 1000;
+    let from = 0;
+    while (true) {
+      const { data, error } = await sb
+        .from('predictions')
+        .select('*')
+        .in('match_id', finishedMatchIds)
+        .range(from, from + PAGE - 1);
+      if (error) break;
+      if (!data || data.length === 0) break;
+      predictions.push(...(data as Prediction[]));
+      if (data.length < PAGE) break;
+      from += PAGE;
+    }
+  }
 
   type RankUser = Pick<User, 'id' | 'nickname' | 'avatar_url'>;
   const ranking = computeRanking({
     users: (users ?? []) as RankUser[],
     matches: (matches ?? []) as Match[],
-    predictions: (predictions ?? []) as Prediction[],
+    predictions,
   });
 
   const stageFinished = {

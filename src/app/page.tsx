@@ -28,19 +28,31 @@ export default async function Home() {
     .filter((m) => m.status !== 'scheduled')
     .map((m) => m.id);
 
-  const [{ data: myPredsData }, { data: lockedPredsData }] = await Promise.all([
-    sb.from('predictions').select('*').eq('user_id', user.id).limit(50000),
-    lockedMatchIds.length > 0
-      ? sb
-          .from('predictions')
-          .select('*, user:users(id, nickname, avatar_url)')
-          .in('match_id', lockedMatchIds)
-          .limit(50000)
-      : Promise.resolve({ data: [] as PredWithUser[] }),
-  ]);
-
+  // Mis predicciones (un solo user, no debería superar 1000 nunca)
+  const { data: myPredsData } = await sb
+    .from('predictions')
+    .select('*')
+    .eq('user_id', user.id);
   const myPredictions = (myPredsData ?? []) as Prediction[];
-  const lockedPreds = (lockedPredsData ?? []) as PredWithUser[];
+
+  // Predicciones para partidos live/finished — paginadas (supera 1000 fácil)
+  const lockedPreds: PredWithUser[] = [];
+  if (lockedMatchIds.length > 0) {
+    const PAGE = 1000;
+    let from = 0;
+    while (true) {
+      const { data, error } = await sb
+        .from('predictions')
+        .select('*, user:users(id, nickname, avatar_url)')
+        .in('match_id', lockedMatchIds)
+        .range(from, from + PAGE - 1);
+      if (error) break;
+      if (!data || data.length === 0) break;
+      lockedPreds.push(...(data as PredWithUser[]));
+      if (data.length < PAGE) break;
+      from += PAGE;
+    }
+  }
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-col gap-5 px-5 pb-12">
