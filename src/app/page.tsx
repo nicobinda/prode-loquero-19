@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { AppHeader } from '@/components/AppHeader';
 import { HomeContent } from '@/components/HomeContent';
 import type { PredWithUser } from '@/components/MatchPopup';
+import { hasKickedOff } from '@/lib/dates';
 import type { Match, Prediction } from '@/types/db';
 
 export const dynamic = 'force-dynamic';
@@ -22,7 +23,16 @@ export default async function Home() {
     .select('*')
     .order('kickoff_at', { ascending: true });
 
-  const matches = (matchesData ?? []) as Match[];
+  const rawMatches = (matchesData ?? []) as Match[];
+
+  // Status "efectivo": si DB dice scheduled pero el kickoff ya pasó (API
+  // lenta), tratamos como 'live'. Así los jugadores pueden ver las
+  // predicciones ajenas en el mismo momento que ya no pueden editar.
+  const matches: Match[] = rawMatches.map((m) =>
+    m.status === 'scheduled' && hasKickedOff(m.kickoff_at)
+      ? { ...m, status: 'live' }
+      : m,
+  );
 
   const lockedMatchIds = matches
     .filter((m) => m.status !== 'scheduled')
