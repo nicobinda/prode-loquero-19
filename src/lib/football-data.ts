@@ -120,11 +120,23 @@ export function goalsExcludingPenalties(m: FdMatch): {
     m.score.duration === 'PENALTY_SHOOTOUT' ||
     (m.score.penalties?.home !== null && m.score.penalties?.home !== undefined);
 
-  // Si hubo prórroga, usamos extraTime; sino fullTime (= regularTime).
+  // Tomamos el máximo entre fullTime y extraTime. football-data a veces
+  // devuelve extraTime = {0,0} cuando no hubo goles en la prórroga
+  // (semántica "goles durante ET" en vez de "score acumulado"), lo cual
+  // pisaba el resultado de 90 min con cero. El max evita ese bug.
   const et = m.score.extraTime;
   const ft = m.score.fullTime;
-  const home = et?.home ?? ft?.home ?? null;
-  const away = et?.away ?? ft?.away ?? null;
+  const pickMax = (
+    a: number | null | undefined,
+    b: number | null | undefined,
+  ): number | null => {
+    if ((a === null || a === undefined) && (b === null || b === undefined)) {
+      return null;
+    }
+    return Math.max(a ?? 0, b ?? 0);
+  };
+  const home = pickMax(et?.home, ft?.home);
+  const away = pickMax(et?.away, ft?.away);
 
   return { home, away, wentToPenalties };
 }
