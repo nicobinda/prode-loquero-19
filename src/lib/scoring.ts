@@ -21,7 +21,8 @@ export function pointsForMatch(m: Match, p: Prediction | null): number {
   const exactA = p.goals_a === m.goals_a ? 1 : 0;
   const exactB = p.goals_b === m.goals_b ? 1 : 0;
   const advance = p.winner_team === m.winner_team ? 1 : 0;
-  const penalties = p.went_to_penalties === m.went_to_penalties ? 1 : 0;
+  // El punto de penales solo se da si predijo penales Y el partido fue a penales.
+  const penalties = p.went_to_penalties && m.went_to_penalties ? 1 : 0;
 
   // Adivinar quién pasa vale 1 punto más que cada gol exacto.
   const goalsPts: number = m.stage === 2 ? 2 : 3;
