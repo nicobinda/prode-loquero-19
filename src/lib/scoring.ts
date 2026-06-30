@@ -25,15 +25,16 @@ export function pointsForMatch(m: Match, p: Prediction | null): number {
   const penalties = p.went_to_penalties && m.went_to_penalties ? 1 : 0;
 
   // Adivinar quién pasa vale 1 punto más que cada gol exacto.
+  // Adivinar si fue a penales vale lo mismo que cada gol exacto.
   const goalsPts: number = m.stage === 2 ? 2 : 3;
   const advancePts: number = goalsPts + 1; // stage 2: 3, stage 3: 4
-  const penaltyPts = 1;
+  const penaltyPts: number = goalsPts;     // stage 2: 2, stage 3: 3
 
   return advance * advancePts + exactA * goalsPts + exactB * goalsPts + penalties * penaltyPts;
 }
 
 export function maxPointsForStage(stage: Stage): number {
   if (stage === 1) return 1;
-  if (stage === 2) return 3 + 2 + 2 + 1;   // 8 por partido
-  return 4 + 3 + 3 + 1;                     // 11 por partido
+  if (stage === 2) return 3 + 2 + 2 + 2;   // 9 por partido
+  return 4 + 3 + 3 + 3;                     // 13 por partido
 }

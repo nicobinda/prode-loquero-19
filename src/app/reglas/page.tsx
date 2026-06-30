@@ -123,7 +123,7 @@ function PointsTable() {
         ['Quién pasa', '+3'],
         ['Goles exactos equipo A', '+2'],
         ['Goles exactos equipo B', '+2'],
-        ['Acertar si fue a penales', '+1'],
+        ['Acertar si fue a penales', '+2'],
       ],
     },
     {
@@ -133,7 +133,7 @@ function PointsTable() {
         ['Quién pasa', '+4'],
         ['Goles exactos equipo A', '+3'],
         ['Goles exactos equipo B', '+3'],
-        ['Acertar si fue a penales', '+1'],
+        ['Acertar si fue a penales', '+3'],
       ],
     },
   ];
